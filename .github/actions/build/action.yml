@@ -126,16 +126,20 @@ runs:
     - name: Cross-compile PufferPanel (Go → armhf)
       shell: bash
       run: |
-        echo "::group::Install Go"
-        sudo apt install --yes golang-go npm
+        echo "::group::Install Go and Yarn"
+        sudo apt install --yes golang-go
+        sudo npm install -g yarn
         echo "::endgroup::"
 
         echo "::group::Clone and build PufferPanel"
         git clone --depth 1 https://github.com/pufferpanel/pufferpanel.git /tmp/pufferpanel
         cd /tmp/pufferpanel
 
-        # Build frontend (Vue.js)
-        cd client && npm ci && npm run build && cd ..
+        # Build frontend (Vue.js) — PufferPanel uses yarn
+        cd client
+        yarn install --frozen-lockfile
+        yarn build
+        cd ..
 
         # Cross-compile backend for armhf
         CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o pufferpanel -ldflags="-s -w" ./cmd
@@ -161,10 +165,7 @@ runs:
 
         # Configure cross-compilation linker
         mkdir -p ~/.cargo
-        cat >> ~/.cargo/config.toml << 'CARGOEOF'
-        [target.armv7-unknown-linux-gnueabihf]
-        linker = "arm-linux-gnueabihf-gcc"
-        CARGOEOF
+        printf '[target.armv7-unknown-linux-gnueabihf]\nlinker = "arm-linux-gnueabihf-gcc"\n' >> ~/.cargo/config.toml
 
         cargo build --release --target armv7-unknown-linux-gnueabihf
         echo "::endgroup::"
