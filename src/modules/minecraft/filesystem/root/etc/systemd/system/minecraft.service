@@ -1,6 +1,6 @@
 [Unit]
 Description=Minecraft Server (PaperMC)
-After=network-online.target
+After=network-online.target minecraft-configurator.service
 Wants=network-online.target
 
 [Service]
@@ -11,6 +11,9 @@ ExecStart=/opt/minecraft/start-server.sh
 ExecStop=/bin/kill -SIGINT $MAINPID
 Restart=on-failure
 RestartSec=30
+TimeoutStopSec=120
+StartLimitBurst=5
+StartLimitIntervalSec=300
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=YumiOS Minecraft configurator (boot config)
+Before=minecraft.service pufferpanel.service
+After=local-fs.target
+ConditionPathExists=/boot/minecraft-config.txt
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/minecraft-configurator
+
+[Install]
+WantedBy=multi-user.target

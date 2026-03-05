@@ -1,0 +1,72 @@
+# YumiOS Minecraft — Paper world defaults optimisé pour SmartPi One (1 Go RAM)
+
+_version: 31
+
+chunks:
+  auto-save-interval: 6000
+  max-auto-save-chunks-per-tick: 6
+  prevent-moving-into-unloaded-chunks: true
+  delay-chunk-unloads-by: 10s
+
+entities:
+  spawning:
+    per-player-mob-spawns: true
+    spawn-limits:
+      monster: 30
+      creature: 8
+      ambient: 1
+      axolotls: 3
+      underground-water-creature: 3
+      water-creature: 3
+      water-ambient: 3
+    despawn-ranges:
+      monster:
+        soft: 28
+        hard: 72
+      creature:
+        soft: 28
+        hard: 72
+      ambient:
+        soft: 28
+        hard: 56
+      axolotls:
+        soft: 28
+        hard: 72
+      underground-water-creature:
+        soft: 28
+        hard: 56
+      water-creature:
+        soft: 28
+        hard: 56
+      water-ambient:
+        soft: 28
+        hard: 48
+    tick-rates:
+      monster: 1
+      creature: 3
+      ambient: 4
+      axolotls: 3
+      underground-water-creature: 3
+      water-creature: 3
+      water-ambient: 4
+
+environment:
+  fire-tick-delay: 30
+  water-over-lava-flow-speed: 5
+  grass-spread-tick-rate: 4
+  optimize-explosions: true
+
+tick-rates:
+  container-update: 3
+  grass-spread: 4
+  mob-spawner: 2
+  sensor:
+    villager:
+      secondarypoisensor: 80
+
+collisions:
+  max-entity-collisions: 2
+
+misc:
+  redstone-implementation: ALTERNATE_CURRENT
+  update-pathfinding-on-block-update: false

@@ -4,9 +4,9 @@
 # Java package — openjdk-21 pour Minecraft 1.21+
 [ -n "${MINECRAFT_JAVA_PACKAGE}" ] || MINECRAFT_JAVA_PACKAGE="openjdk-21-jre-headless"
 
-# Heap JVM — SmartPi One 1GB DDR3
+# Heap JVM — SmartPi One 1GB DDR3 (réduit pour laisser place à PufferPanel)
 [ -n "${MINECRAFT_XMS}" ]          || MINECRAFT_XMS="512M"
-[ -n "${MINECRAFT_XMX}" ]          || MINECRAFT_XMX="768M"
+[ -n "${MINECRAFT_XMX}" ]          || MINECRAFT_XMX="700M"
 
 # Dépendances
 [ -n "${MODULE_DEPS}" ]            || MODULE_DEPS="${MINECRAFT_JAVA_PACKAGE} wget curl python3"

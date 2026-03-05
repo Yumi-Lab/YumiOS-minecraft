@@ -1,0 +1,18 @@
+[Unit]
+Description=PufferPanel Game Server Management
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+ExecStartPre=/usr/local/bin/pufferpanel-setup
+ExecStart=/usr/local/bin/pufferpanel run
+WorkingDirectory=/var/lib/pufferpanel
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=300
+
+[Install]
+WantedBy=multi-user.target

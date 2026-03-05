@@ -25,7 +25,7 @@ BASE_BOOT_MOUNT_PATH="/boot/"
 # Compress not needed due compression done in workflow
 BASE_RELEASE_COMPRESS=no
 # Default modules chain
-MODULES="base(udev_fix,armbian(armbian_net,yumios,minecraft))"
+MODULES="base(udev_fix,armbian(armbian_net,yumios,minecraft,pumpkin,pufferpanel))"
 
 # export Variables
 export DOWNLOAD_BASE_URL

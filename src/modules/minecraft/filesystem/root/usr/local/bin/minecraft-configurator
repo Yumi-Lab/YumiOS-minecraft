@@ -1,0 +1,46 @@
+#!/bin/bash
+# YumiOS Minecraft — Applique la configuration depuis /boot/minecraft-config.txt
+
+set -euo pipefail
+
+CONFIG_FILE="/boot/minecraft-config.txt"
+APPLIED_FILE="/boot/minecraft-config.txt.applied"
+SERVER_PROPS="/opt/minecraft/server.properties"
+PUMPKIN_CONFIG="/opt/pumpkin/configuration.toml"
+LOG="/var/log/minecraft-configurator.log"
+
+log() {
+    echo "[minecraft-configurator] $(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "${LOG}"
+}
+
+if [ ! -f "${CONFIG_FILE}" ]; then
+    exit 0
+fi
+
+log "Configuration trouvée, application des paramètres..."
+
+# Lire les variables
+# shellcheck disable=SC1090
+source "${CONFIG_FILE}"
+
+# Appliquer à server.properties (PaperMC)
+if [ -f "${SERVER_PROPS}" ]; then
+    [ -n "${SERVER_NAME:-}" ] && sed -i "s/^motd=.*/motd=${SERVER_NAME}/" "${SERVER_PROPS}"
+    [ -n "${MAX_PLAYERS:-}" ] && sed -i "s/^max-players=.*/max-players=${MAX_PLAYERS}/" "${SERVER_PROPS}"
+    [ -n "${GAME_MODE:-}" ] && sed -i "s/^gamemode=.*/gamemode=${GAME_MODE}/" "${SERVER_PROPS}"
+    [ -n "${DIFFICULTY:-}" ] && sed -i "s/^difficulty=.*/difficulty=${DIFFICULTY}/" "${SERVER_PROPS}"
+    [ -n "${VIEW_DISTANCE:-}" ] && sed -i "s/^view-distance=.*/view-distance=${VIEW_DISTANCE}/" "${SERVER_PROPS}"
+    log "server.properties mis à jour."
+fi
+
+# Appliquer à Pumpkin configuration.toml
+if [ -f "${PUMPKIN_CONFIG}" ]; then
+    [ -n "${SERVER_NAME:-}" ] && sed -i "s/^motd = .*/motd = \"${SERVER_NAME}\"/" "${PUMPKIN_CONFIG}"
+    [ -n "${MAX_PLAYERS:-}" ] && sed -i "s/^max_players = .*/max_players = ${MAX_PLAYERS}/" "${PUMPKIN_CONFIG}"
+    [ -n "${VIEW_DISTANCE:-}" ] && sed -i "s/^view_distance = .*/view_distance = ${VIEW_DISTANCE}/" "${PUMPKIN_CONFIG}"
+    log "Pumpkin configuration.toml mis à jour."
+fi
+
+# Marquer comme appliqué (renommer pour ne pas réappliquer au prochain boot)
+mv "${CONFIG_FILE}" "${APPLIED_FILE}"
+log "Configuration appliquée et fichier renommé en .applied"

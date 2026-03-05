@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# YumiOS Minecraft — Statut serveur à la connexion SSH
+
+# shellcheck enable=require-variable-braces
+
+SERVER_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+
+echo ""
+echo -e "\e[33m── Minecraft Server ──\e[0m"
+
+# Statut du service Minecraft (géré par PufferPanel ou standalone)
+if systemctl is-active --quiet minecraft.service 2>/dev/null; then
+    echo -e "  Serveur MC  : \e[32mActif\e[0m"
+    echo -e "  Adresse     : \e[34m${SERVER_IP}:25565\e[0m"
+else
+    echo -e "  Serveur MC  : \e[31mInactif\e[0m"
+fi
+
+# Statut PufferPanel
+if systemctl is-active --quiet pufferpanel.service 2>/dev/null; then
+    echo -e "  Panel web   : \e[34mhttp://${SERVER_IP}:8080\e[0m"
+else
+    echo -e "  Panel web   : \e[31mInactif\e[0m"
+fi
+
+echo ""

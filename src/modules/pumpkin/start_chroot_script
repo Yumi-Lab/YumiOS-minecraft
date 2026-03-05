@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#### pumpkin — Serveur Minecraft Rust (ultra-léger)
+####
+#### YumiOS Minecraft — Pumpkin pour SmartPi One (armhf)
+####
+
+# shellcheck enable=require-variable-braces
+set -Ee
+export LC_ALL=C
+export DEBIAN_FRONTEND=noninteractive
+
+# shellcheck disable=SC1091
+source /common.sh
+install_cleanup_trap
+
+echo_green "Installing Pumpkin server ..."
+
+unpack /filesystem/root /
+
+# Créer l'utilisateur pumpkin
+useradd -r -d /opt/pumpkin -s /usr/sbin/nologin pumpkin
+
+# Rendre le binaire exécutable
+chmod +x /opt/pumpkin/pumpkin
+
+# Permissions
+chown -R pumpkin:pumpkin /opt/pumpkin
+
+# Pas de service systemd — PufferPanel gère le lifecycle du serveur Pumpkin
+
+echo_green "Installing Pumpkin server ... [DONE]"

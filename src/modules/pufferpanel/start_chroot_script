@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#### pufferpanel — Panel web de management Minecraft
+####
+#### YumiOS Minecraft — PufferPanel pour SmartPi One (armhf)
+####
+
+# shellcheck enable=require-variable-braces
+set -Ee
+export LC_ALL=C
+export DEBIAN_FRONTEND=noninteractive
+
+# shellcheck disable=SC1091
+source /common.sh
+install_cleanup_trap
+
+echo_green "Installing PufferPanel ..."
+
+unpack /filesystem/root /
+
+# Installer dépendances si définies
+if [ -n "${MODULE_DEPS}" ]; then
+    apt-get update --allow-releaseinfo-change
+    # shellcheck disable=SC2086
+    check_install_pkgs ${MODULE_DEPS}
+fi
+
+# Créer l'utilisateur système pufferpanel
+useradd -r -d /var/lib/pufferpanel -s /usr/sbin/nologin pufferpanel
+
+# Créer les répertoires nécessaires
+mkdir -p /var/lib/pufferpanel/servers
+mkdir -p /var/lib/pufferpanel/templates
+mkdir -p /var/lib/pufferpanel/binaries
+mkdir -p /var/log/pufferpanel
+mkdir -p /etc/pufferpanel
+
+# Rendre le binaire exécutable
+chmod +x /usr/local/bin/pufferpanel
+
+# Permissions
+chown -R pufferpanel:pufferpanel /var/lib/pufferpanel
+chown -R pufferpanel:pufferpanel /var/log/pufferpanel
+chown -R pufferpanel:pufferpanel /etc/pufferpanel
+
+# Copier les templates serveur
+cp /filesystem/root/var/lib/pufferpanel/templates/*.json /var/lib/pufferpanel/templates/ 2>/dev/null || true
+
+# Créer le compte admin par défaut
+# PufferPanel crée l'utilisateur au premier lancement via CLI
+# On prépare un script de premier démarrage
+cat > /usr/local/bin/pufferpanel-setup << 'SETUPEOF'
+#!/bin/bash
+# Création du compte admin PufferPanel au premier démarrage
+SETUP_FLAG="/var/lib/pufferpanel/.setup-done"
+if [ ! -f "${SETUP_FLAG}" ]; then
+    /usr/local/bin/pufferpanel user add \
+        --name "${PUFFERPANEL_ADMIN_USER:-admin}" \
+        --password "${PUFFERPANEL_ADMIN_PASS:-yumi}" \
+        --admin
+    touch "${SETUP_FLAG}"
+fi
+SETUPEOF
+chmod +x /usr/local/bin/pufferpanel-setup
+
+# Ouvrir les ports dans iptables (MC + PufferPanel)
+if command -v iptables &>/dev/null; then
+    # Sauvegarder les règles existantes si elles existent
+    mkdir -p /etc/iptables
+    # Règles à appliquer au premier boot
+    cat > /etc/iptables/rules.v4 << 'FWEOF'
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -p tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp --dport 25565 -j ACCEPT
+-A INPUT -p tcp --dport 8080 -j ACCEPT
+-A INPUT -p tcp --dport 5657 -j ACCEPT
+COMMIT
+FWEOF
+fi
+
+# Activer le service
+systemctl_if_exists enable pufferpanel.service
+
+echo_green "Installing PufferPanel ... [DONE]"

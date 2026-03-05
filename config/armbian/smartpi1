@@ -4,12 +4,11 @@
 # shellcheck disable=SC2034
 
 # Image source — SmartPi One (AllWinner H3, armhf, Debian 12 Bookworm)
-# TODO: vérifier le nom exact du fichier dans la release SmartPi-armbian v1.6.0
-DOWNLOAD_URL_CHECKSUM="${DOWNLOAD_BASE_URL}/Yumi-smartpi1-bookworm-server.img.xz.sha256"
-DOWNLOAD_URL_IMAGE="${DOWNLOAD_BASE_URL}/Yumi-smartpi1-bookworm-server.img.xz"
+DOWNLOAD_URL_CHECKSUM="${DOWNLOAD_BASE_URL}/Yumi-smartpi1-bookworm-debian12-server-2026-03-01-2139.img.xz.sha256"
+DOWNLOAD_URL_IMAGE="${DOWNLOAD_BASE_URL}/Yumi-smartpi1-bookworm-debian12-server-2026-03-01-2139.img.xz"
 
 BASE_IMAGE_ENLARGEROOT=3000
-MODULES="base(udev_fix,armbian(armbian_net,yumios,minecraft))"
+MODULES="base(udev_fix,armbian(armbian_net,yumios,minecraft,pumpkin,pufferpanel))"
 
 # export Variables
 export BASE_ARCH

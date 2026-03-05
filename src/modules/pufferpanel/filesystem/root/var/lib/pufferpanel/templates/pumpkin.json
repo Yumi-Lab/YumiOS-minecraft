@@ -1,0 +1,32 @@
+{
+  "name": "Pumpkin",
+  "display": "Pumpkin - Serveur Minecraft Rust (ultra-léger, expérimental)",
+  "type": "standard",
+  "install": [],
+  "run": {
+    "command": "/opt/pumpkin/pumpkin",
+    "workingDirectory": "/opt/pumpkin",
+    "pre": [],
+    "post": [],
+    "environmentVars": {}
+  },
+  "data": {
+    "maxplayers": {
+      "type": "integer",
+      "desc": "Nombre maximum de joueurs",
+      "display": "Max Players",
+      "required": true,
+      "value": 5
+    },
+    "viewdistance": {
+      "type": "integer",
+      "desc": "Distance de vue en chunks",
+      "display": "View Distance",
+      "required": true,
+      "value": 6
+    }
+  },
+  "environment": {
+    "type": "standard"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "name": "PaperMC",
+  "display": "PaperMC - Serveur Minecraft Java (survie complète)",
+  "type": "java",
+  "install": [
+    {
+      "type": "command",
+      "commands": [
+        "if [ ! -f server.jar ]; then MC_VERSION=${version}; BUILD=$(curl -sf 'https://api.papermc.io/v2/projects/paper/versions/'${MC_VERSION}'/builds' | python3 -c \"import sys,json; builds=json.load(sys.stdin)['builds']; print(builds[-1]['build'])\"); wget -O server.jar 'https://api.papermc.io/v2/projects/paper/versions/'${MC_VERSION}'/builds/'${BUILD}'/downloads/paper-'${MC_VERSION}'-'${BUILD}'.jar'; echo 'eula=true' > eula.txt; fi"
+      ]
+    }
+  ],
+  "run": {
+    "command": "java -Xms${xms} -Xmx${xmx} ${jvmflags} -jar server.jar nogui",
+    "workingDirectory": "/opt/minecraft",
+    "pre": [],
+    "post": [],
+    "environmentVars": {}
+  },
+  "data": {
+    "version": {
+      "type": "string",
+      "desc": "Version Minecraft",
+      "display": "Version MC",
+      "required": true,
+      "value": "1.21.4"
+    },
+    "xms": {
+      "type": "string",
+      "desc": "Mémoire JVM minimale",
+      "display": "Heap Min",
+      "required": true,
+      "value": "512M"
+    },
+    "xmx": {
+      "type": "string",
+      "desc": "Mémoire JVM maximale",
+      "display": "Heap Max",
+      "required": true,
+      "value": "700M"
+    },
+    "jvmflags": {
+      "type": "string",
+      "desc": "Flags JVM supplémentaires (Aikar)",
+      "display": "JVM Flags",
+      "required": false,
+      "value": "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1"
+    }
+  },
+  "environment": {
+    "type": "standard"
+  }
+}

@@ -1,0 +1,9 @@
+/opt/minecraft/logs/*.log {
+    daily
+    rotate 3
+    compress
+    missingok
+    notifempty
+    copytruncate
+    maxsize 10M
+}

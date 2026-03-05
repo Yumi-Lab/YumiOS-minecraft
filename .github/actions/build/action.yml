@@ -1,6 +1,6 @@
-name: "MainsailOS/build"
-author: "Stefan Dej"
-description: "Build MainsailOS images"
+name: "YumiOS-minecraft/build"
+author: "Yumi Lab"
+description: "Build YumiOS Minecraft images"
 inputs:
   config:
     description: "Board config name"
@@ -122,6 +122,56 @@ runs:
       run: |
         cd repository/src/image
         sha256sum -b ${{ steps.checksum.outputs.FILENAME }}
+
+    - name: Cross-compile PufferPanel (Go → armhf)
+      shell: bash
+      run: |
+        echo "::group::Install Go"
+        sudo apt install --yes golang-go npm
+        echo "::endgroup::"
+
+        echo "::group::Clone and build PufferPanel"
+        git clone --depth 1 https://github.com/pufferpanel/pufferpanel.git /tmp/pufferpanel
+        cd /tmp/pufferpanel
+
+        # Build frontend (Vue.js)
+        cd client && npm ci && npm run build && cd ..
+
+        # Cross-compile backend for armhf
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o pufferpanel -ldflags="-s -w" ./cmd
+        echo "::endgroup::"
+
+        # Copier le binaire dans le module overlay
+        cp /tmp/pufferpanel/pufferpanel ${{ github.workspace }}/repository/src/modules/pufferpanel/filesystem/root/usr/local/bin/pufferpanel
+        echo "PufferPanel cross-compiled for armhf successfully"
+
+    - name: Cross-compile Pumpkin (Rust → armhf)
+      shell: bash
+      run: |
+        echo "::group::Install Rust toolchain"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+        source "$HOME/.cargo/env"
+        sudo apt install --yes gcc-arm-linux-gnueabihf
+        rustup target add armv7-unknown-linux-gnueabihf
+        echo "::endgroup::"
+
+        echo "::group::Clone and build Pumpkin"
+        git clone --depth 1 https://github.com/Pumpkin-MC/Pumpkin.git /tmp/pumpkin
+        cd /tmp/pumpkin
+
+        # Configure cross-compilation linker
+        mkdir -p ~/.cargo
+        cat >> ~/.cargo/config.toml << 'CARGOEOF'
+        [target.armv7-unknown-linux-gnueabihf]
+        linker = "arm-linux-gnueabihf-gcc"
+        CARGOEOF
+
+        cargo build --release --target armv7-unknown-linux-gnueabihf
+        echo "::endgroup::"
+
+        # Copier le binaire dans le module overlay
+        cp /tmp/pumpkin/target/armv7-unknown-linux-gnueabihf/release/pumpkin ${{ github.workspace }}/repository/src/modules/pumpkin/filesystem/root/opt/pumpkin/pumpkin
+        echo "Pumpkin cross-compiled for armhf successfully"
 
     - name: Update CustomPiOS Paths
       shell: bash

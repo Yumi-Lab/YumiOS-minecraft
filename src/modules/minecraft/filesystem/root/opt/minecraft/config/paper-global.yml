@@ -1,0 +1,32 @@
+# YumiOS Minecraft — Paper global config optimisé pour SmartPi One (1 Go RAM)
+
+_version: 29
+
+chunk-system:
+  gen-parallelism: default
+  io-threads: 1
+  worker-threads: 1
+
+async-chunks:
+  threads: 1
+
+packet-limiter:
+  all-packets:
+    action: KICK
+    interval: 7.0
+    max-packet-rate: 500.0
+  overrides:
+    ServerboundPlaceRecipePacket:
+      action: DROP
+      interval: 4.0
+      max-packet-rate: 5.0
+
+timings:
+  enabled: false
+
+messages:
+  kick:
+    connection-throttle: Connection throttled! Please wait before reconnecting.
+
+misc:
+  max-joins-per-tick: 3

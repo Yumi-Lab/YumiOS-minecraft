@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2034
+
+# Pumpkin — serveur Minecraft en Rust (ultra-léger, expérimental)
+# Binaire cross-compilé pour armhf pendant le build CI
+
+[ -n "${PUMPKIN_VERSION}" ]  || PUMPKIN_VERSION="master"
+
+# Pas de dépendances apt (binaire Rust statique)
+[ -n "${MODULE_DEPS}" ]      || MODULE_DEPS=""

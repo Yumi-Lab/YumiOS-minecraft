@@ -24,17 +24,41 @@ check_install_pkgs ${MODULE_DEPS}
 # Créer l'utilisateur minecraft
 useradd -r -m -d /opt/minecraft -s /bin/bash minecraft
 
+# Générer server.env avec les variables de config et flags Aikar (G1GC, adapté 700M heap)
+cat > /opt/minecraft/server.env << MCEOF
+# YumiOS Minecraft — variables serveur (généré au build)
+MC_VERSION="1.21.4"
+MINECRAFT_XMS="${MINECRAFT_XMS}"
+MINECRAFT_XMX="${MINECRAFT_XMX}"
+JVM_FLAGS="-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true"
+MCEOF
+
 # Swap 1GB pour stabiliser le GC Java (SmartPi One 1GB DDR3)
 fallocate -l 1G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
 echo '/swapfile none swap sw 0 0' >> /etc/fstab
 
+# Tuning I/O pour SD card
+cat > /etc/sysctl.d/99-minecraft.conf << SYSEOF
+vm.swappiness=10
+vm.vfs_cache_pressure=50
+SYSEOF
+
+# Copier le template de config boot
+if [ -f /boot/minecraft-config.txt.template ]; then
+    cp /boot/minecraft-config.txt.template /boot/minecraft-config.txt
+fi
+
+# Rendre le configurateur exécutable
+chmod +x /usr/local/bin/minecraft-configurator
+
 # Permissions
 chown -R minecraft:minecraft /opt/minecraft
 chmod +x /opt/minecraft/start-server.sh
 
-# Activer le service
+# Activer les services
 systemctl_if_exists enable minecraft.service
+systemctl_if_exists enable minecraft-configurator.service
 
 echo_green "Installing Minecraft server ... [DONE]"

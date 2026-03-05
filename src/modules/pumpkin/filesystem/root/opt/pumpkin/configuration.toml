@@ -1,0 +1,14 @@
+# YumiOS Minecraft — Configuration Pumpkin optimisée pour SmartPi One
+
+[server]
+online_mode = true
+max_players = 5
+view_distance = 6
+simulation_distance = 4
+default_gamemode = "Survival"
+default_difficulty = "Normal"
+motd = "YumiOS Minecraft (Pumpkin)"
+port = 25565
+
+[resource_pack]
+enabled = false

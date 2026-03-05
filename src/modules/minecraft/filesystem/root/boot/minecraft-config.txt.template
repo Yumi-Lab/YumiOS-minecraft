@@ -1,0 +1,22 @@
+# YumiOS Minecraft — Configuration serveur
+# Éditez ce fichier depuis votre PC (partition boot FAT32) puis insérez la SD card.
+# Les paramètres sont appliqués au prochain démarrage.
+# Ce fichier est lu une seule fois puis renommé en minecraft-config.txt.applied
+
+# Type de serveur : papermc (survie complète) ou pumpkin (ultra-léger, expérimental)
+SERVER_TYPE=papermc
+
+# Nom du serveur (affiché dans la liste des serveurs Minecraft)
+SERVER_NAME=YumiOS Minecraft Server
+
+# Nombre maximum de joueurs simultanés (recommandé: 3-5 pour SmartPi One)
+MAX_PLAYERS=5
+
+# Mode de jeu : survival, creative, adventure, spectator
+GAME_MODE=survival
+
+# Difficulté : peaceful, easy, normal, hard
+DIFFICULTY=normal
+
+# Distance de vue en chunks (6 = recommandé pour SmartPi One, max 10)
+VIEW_DISTANCE=6
