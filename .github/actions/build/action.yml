@@ -123,11 +123,16 @@ runs:
         cd repository/src/image
         sha256sum -b ${{ steps.checksum.outputs.FILENAME }}
 
+    - name: Setup Go 1.23
+      uses: actions/setup-go@v5
+      with:
+        go-version: "1.23"
+        cache: false
+
     - name: Cross-compile PufferPanel (Go → armhf)
       shell: bash
       run: |
-        echo "::group::Install Go and Yarn"
-        sudo apt install --yes golang-go
+        echo "::group::Install Yarn"
         sudo npm install -g yarn
         echo "::endgroup::"
 
