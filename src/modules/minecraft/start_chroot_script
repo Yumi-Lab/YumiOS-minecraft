@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#### minecraft — Minecraft server (PaperMC)
+####
+#### YumiOS Minecraft — serveur Minecraft pour SmartPi One (armhf)
+####
+
+# shellcheck enable=require-variable-braces
+set -Ee
+export LC_ALL=C
+export DEBIAN_FRONTEND=noninteractive
+
+# shellcheck disable=SC1091
+source /common.sh
+install_cleanup_trap
+
+echo_green "Installing Minecraft server ..."
+
+unpack /filesystem/root /
+
+apt-get update --allow-releaseinfo-change
+# shellcheck disable=SC2086
+check_install_pkgs ${MODULE_DEPS}
+
+# Créer l'utilisateur minecraft
+useradd -r -m -d /opt/minecraft -s /bin/bash minecraft
+
+# Swap 1GB pour stabiliser le GC Java (SmartPi One 1GB DDR3)
+fallocate -l 1G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+# Permissions
+chown -R minecraft:minecraft /opt/minecraft
+chmod +x /opt/minecraft/start-server.sh
+
+# Activer le service
+systemctl_if_exists enable minecraft.service
+
+echo_green "Installing Minecraft server ... [DONE]"

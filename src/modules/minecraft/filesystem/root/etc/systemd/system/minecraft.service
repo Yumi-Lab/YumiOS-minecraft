@@ -1,0 +1,16 @@
+[Unit]
+Description=Minecraft Server (PaperMC)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=minecraft
+WorkingDirectory=/opt/minecraft
+ExecStart=/opt/minecraft/start-server.sh
+ExecStop=/bin/kill -SIGINT $MAINPID
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
