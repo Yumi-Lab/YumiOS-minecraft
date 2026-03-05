@@ -153,6 +153,7 @@ runs:
         echo "::endgroup::"
 
         # Copier le binaire dans le module overlay
+        mkdir -p ${{ github.workspace }}/repository/src/modules/pufferpanel/filesystem/root/usr/local/bin
         cp /tmp/pufferpanel/pufferpanel ${{ github.workspace }}/repository/src/modules/pufferpanel/filesystem/root/usr/local/bin/pufferpanel
         echo "PufferPanel cross-compiled for armhf successfully"
 
@@ -178,6 +179,7 @@ runs:
         echo "::endgroup::"
 
         # Copier le binaire dans le module overlay
+        mkdir -p ${{ github.workspace }}/repository/src/modules/pumpkin/filesystem/root/opt/pumpkin
         cp /tmp/pumpkin/target/armv7-unknown-linux-gnueabihf/release/pumpkin ${{ github.workspace }}/repository/src/modules/pumpkin/filesystem/root/opt/pumpkin/pumpkin
         echo "Pumpkin cross-compiled for armhf successfully"
 
