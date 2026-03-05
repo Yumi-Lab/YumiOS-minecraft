@@ -132,7 +132,8 @@ runs:
     - name: Cross-compile PufferPanel (Go → armhf)
       shell: bash
       run: |
-        echo "::group::Install Yarn"
+        echo "::group::Install deps"
+        sudo apt install --yes gcc-arm-linux-gnueabihf
         sudo npm install -g yarn
         echo "::endgroup::"
 
@@ -146,8 +147,9 @@ runs:
         yarn build
         cd ..
 
-        # Cross-compile backend for armhf
-        CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o pufferpanel -ldflags="-s -w" ./cmd
+        # Cross-compile backend for armhf (CGO required for go-sqlite3)
+        CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc GOOS=linux GOARCH=arm GOARM=7 \
+          go build -o pufferpanel -ldflags="-s -w" ./cmd
         echo "::endgroup::"
 
         # Copier le binaire dans le module overlay
