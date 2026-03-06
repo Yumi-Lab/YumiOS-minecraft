@@ -34,15 +34,16 @@ JVM_FLAGS="-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX
 MCEOF
 
 # Swap 1GB pour stabiliser le GC Java (SmartPi One 1GB DDR3)
-# En chroot, le swapfile du host peut être monté — on ne peut ni swapoff ni rm.
-# Si le fichier existe déjà (image base Armbian), on le garde tel quel.
-if [ ! -f /swapfile ]; then
-    fallocate -l 1G /swapfile
-    chmod 600 /swapfile
-    mkswap /swapfile
+# Utilise /var/swap (pas /swapfile) : en chroot, mkswap compare les chemins
+# dans /proc/swaps (bind-monté depuis le host CI). Si le host a /swapfile actif,
+# mkswap refuse de formater même si c'est un fichier différent sur un autre FS.
+if [ ! -f /var/swap ]; then
+    fallocate -l 1G /var/swap
+    chmod 600 /var/swap
+    mkswap /var/swap
 fi
-if ! grep -q '/swapfile' /etc/fstab; then
-    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+if ! grep -q '/var/swap' /etc/fstab; then
+    echo '/var/swap none swap sw 0 0' >> /etc/fstab
 fi
 
 # Tuning I/O pour SD card
