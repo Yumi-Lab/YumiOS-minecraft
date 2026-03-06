@@ -52,6 +52,16 @@ vm.swappiness=10
 vm.vfs_cache_pressure=50
 SYSEOF
 
+# Télécharger PaperMC pendant le build (pas au premier boot)
+MC_VERSION="1.21.4"
+echo_green "Downloading PaperMC ${MC_VERSION} ..."
+PAPER_BUILD=$(curl -sf "https://api.papermc.io/v2/projects/paper/versions/${MC_VERSION}/builds" \
+    | python3 -c "import sys,json; builds=json.load(sys.stdin)['builds']; print(builds[-1]['build'])")
+wget -q -O /opt/minecraft/server.jar \
+    "https://api.papermc.io/v2/projects/paper/versions/${MC_VERSION}/builds/${PAPER_BUILD}/downloads/paper-${MC_VERSION}-${PAPER_BUILD}.jar"
+echo "eula=true" > /opt/minecraft/eula.txt
+echo_green "PaperMC ${MC_VERSION} build ${PAPER_BUILD} downloaded."
+
 # Copier le template de config boot
 if [ -f /boot/minecraft-config.txt.template ]; then
     cp /boot/minecraft-config.txt.template /boot/minecraft-config.txt
