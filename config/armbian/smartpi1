@@ -7,11 +7,17 @@
 DOWNLOAD_URL_CHECKSUM="${DOWNLOAD_BASE_URL}/Yumi-smartpi1-bookworm-debian12-server-2026-03-01-2139.img.xz.sha256"
 DOWNLOAD_URL_IMAGE="${DOWNLOAD_BASE_URL}/Yumi-smartpi1-bookworm-debian12-server-2026-03-01-2139.img.xz"
 
+# OS de base — inclus dans le nom de l'image générée
+BASE_OS_CODENAME="bookworm"
+BASE_OS_VERSION="debian12"
+
 BASE_IMAGE_ENLARGEROOT=3000
 # TODO: réactiver pumpkin quand le projet supportera armhf (32-bit)
 MODULES="base(udev_fix,armbian(armbian_net,yumios,minecraft,pufferpanel))"
 
 # export Variables
 export BASE_ARCH
+export BASE_OS_CODENAME
+export BASE_OS_VERSION
 export DOWNLOAD_URL_CHECKSUM
 export DOWNLOAD_URL_IMAGE

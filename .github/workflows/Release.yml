@@ -95,7 +95,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          NOW="$(date +"%Y-%m-%d")"
+          NOW="$(date +"%Y-%m-%d-%H%M")"
           echo "date=${NOW}" >> $GITHUB_OUTPUT
 
   matrix:
@@ -145,10 +145,9 @@ jobs:
         shell: bash
         run: |
           source repository/src/config
-          base_name="${{ needs.release.outputs.date }}-${DIST_NAME}-${DIST_VERSION}"
-          image="${base_name}-${{ steps.build.outputs.type }}-${{ steps.build.outputs.sbc }}"
+          source "repository/config/${{ matrix.config }}"
+          image="${DIST_NAME}-${DIST_VERSION}-${{ steps.build.outputs.sbc }}-${BASE_OS_CODENAME}-${BASE_OS_VERSION}-${{ needs.release.outputs.date }}"
           mv repository/src/workspace/*.img $image.img
-          echo "base_name=${base_name}" >> $GITHUB_OUTPUT
           echo "image=${image}" >> $GITHUB_OUTPUT
 
       - name: Upload failed Logfile
