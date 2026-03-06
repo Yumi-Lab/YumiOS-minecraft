@@ -18,8 +18,17 @@ echo_green "Installing Minecraft server ..."
 unpack /filesystem/root /
 
 apt-get update --allow-releaseinfo-change
+
+# Java 21 n'est pas dans les repos principaux de Bookworm (Debian 12),
+# il faut explicitement bookworm-backports.
+if ! dpkg -l | grep -q openjdk-21; then
+    apt-get install -y -t bookworm-backports openjdk-21-jre-headless || \
+        apt-get install -y openjdk-21-jre-headless
+fi
+
+# Autres dépendances (wget, curl, python3)
 # shellcheck disable=SC2086
-check_install_pkgs ${MODULE_DEPS}
+check_install_pkgs wget curl python3
 
 # Créer l'utilisateur minecraft
 useradd -r -m -d /opt/minecraft -s /bin/bash minecraft
