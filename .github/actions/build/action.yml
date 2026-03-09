@@ -91,7 +91,7 @@ runs:
       run: |
         cd repository/src/image
         FILENAME=$(basename ${{ steps.config.outputs.DOWNLOAD_URL_CHECKSUM }})
-        wget -O ${FILENAME} ${{ steps.config.outputs.DOWNLOAD_URL_CHECKSUM }}
+        wget --tries=5 --retry-on-http-error=502,503,504 -O ${FILENAME} ${{ steps.config.outputs.DOWNLOAD_URL_CHECKSUM }}
         FILE_CONTENT=$(head -n 1 $FILENAME)
         CHECKSUM=$(echo $FILE_CONTENT | cut -d' ' -f1)
 
@@ -115,7 +115,7 @@ runs:
       shell: bash
       run: |
         cd repository/src/image
-        wget ${{ steps.config.outputs.DOWNLOAD_URL_IMAGE }}
+        wget --tries=5 --retry-on-http-error=502,503,504 ${{ steps.config.outputs.DOWNLOAD_URL_IMAGE }}
 
     - name: Comparing Checksums
       shell: bash
@@ -157,17 +157,22 @@ runs:
         cp /tmp/pufferpanel/pufferpanel ${{ github.workspace }}/repository/src/modules/pufferpanel/filesystem/root/usr/local/bin/pufferpanel
         echo "PufferPanel cross-compiled for armhf successfully"
 
-    - name: Download Temurin JRE 21 (armhf)
+    - name: Download Liberica JRE 21 (armhf)
       shell: bash
       run: |
-        echo "::group::Download Temurin JRE 21 for ARM 32-bit"
-        TEMURIN_URL="https://api.adoptium.net/v3/binary/latest/21/ga/linux/arm/jre/hotspot/normal/eclipse"
-        wget -q -O /tmp/temurin-jre.tar.gz "${TEMURIN_URL}"
+        echo "::group::Download BellSoft Liberica JRE 21 for ARM 32-bit"
+        # Adoptium Temurin et openjdk-21 Debian n'ont pas de build armhf (32-bit).
+        # BellSoft Liberica est la seule distribution Java 21 LTS supportant arm32.
+        LIBERICA_URL=$(curl -sf \
+          "https://api.bell-sw.com/v1/liberica/releases?arch=arm&os=linux&bitness=32&version-feature=21&version-modifier=latest&bundle-type=jre" \
+          | python3 -c "import sys,json; r=json.load(sys.stdin); print([p['downloadUrl'] for p in r[0]['packages'] if p['downloadUrl'].endswith('.tar.gz')][0])")
+        echo "Liberica URL: ${LIBERICA_URL}"
+        wget --tries=5 --retry-on-http-error=502,503,504 -q -O /tmp/liberica-jre.tar.gz "${LIBERICA_URL}"
         JAVA_DIR="${{ github.workspace }}/repository/src/modules/minecraft/filesystem/root/opt/java"
         mkdir -p "${JAVA_DIR}"
-        tar xzf /tmp/temurin-jre.tar.gz -C "${JAVA_DIR}" --strip-components=1
-        rm -f /tmp/temurin-jre.tar.gz
-        echo "Temurin JRE 21 armhf extracted to ${JAVA_DIR}"
+        tar xzf /tmp/liberica-jre.tar.gz -C "${JAVA_DIR}" --strip-components=1
+        rm -f /tmp/liberica-jre.tar.gz
+        echo "Liberica JRE 21 armhf extracted to ${JAVA_DIR}"
         ls -la "${JAVA_DIR}/bin/java"
         echo "::endgroup::"
 

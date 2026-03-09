@@ -23,8 +23,8 @@ apt-get update --allow-releaseinfo-change
 # shellcheck disable=SC2086
 check_install_pkgs wget curl python3
 
-# Java 21 (Temurin) est pré-installé par le CI dans /opt/java via filesystem overlay.
-# On crée juste le symlink pour que `java` soit dans le PATH.
+# Java 21 (Liberica JRE, BellSoft) est pré-installé par le CI dans /opt/java.
+# Seule distribution Java 21 LTS disponible pour armhf 32-bit (Temurin/openjdk n'ont pas de build armhf).
 ln -sf /opt/java/bin/java /usr/local/bin/java
 
 # Créer l'utilisateur minecraft
@@ -63,7 +63,7 @@ MC_VERSION="1.21.4"
 echo_green "Downloading PaperMC ${MC_VERSION} ..."
 PAPER_BUILD=$(curl -sf "https://api.papermc.io/v2/projects/paper/versions/${MC_VERSION}/builds" \
     | python3 -c "import sys,json; builds=json.load(sys.stdin)['builds']; print(builds[-1]['build'])")
-wget -q -O /opt/minecraft/server.jar \
+wget --tries=5 --retry-on-http-error=502,503,504 -q -O /opt/minecraft/server.jar \
     "https://api.papermc.io/v2/projects/paper/versions/${MC_VERSION}/builds/${PAPER_BUILD}/downloads/paper-${MC_VERSION}-${PAPER_BUILD}.jar"
 echo "eula=true" > /opt/minecraft/eula.txt
 echo_green "PaperMC ${MC_VERSION} build ${PAPER_BUILD} downloaded."
