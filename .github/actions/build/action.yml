@@ -164,8 +164,8 @@ runs:
         # Adoptium Temurin et openjdk-21 Debian n'ont pas de build armhf (32-bit).
         # BellSoft Liberica est la seule distribution Java 21 LTS supportant arm32.
         LIBERICA_URL=$(curl -sf \
-          "https://api.bell-sw.com/v1/liberica/releases?arch=arm&os=linux&bitness=32&version-feature=21&version-modifier=latest&bundle-type=jre" \
-          | python3 -c "import sys,json; r=json.load(sys.stdin); print([p['downloadUrl'] for p in r[0]['packages'] if p['downloadUrl'].endswith('.tar.gz')][0])")
+          "https://api.bell-sw.com/v1/liberica/releases?arch=arm&os=linux&bitness=32&version-feature=21&version-modifier=latest&bundle-type=jre&package-type=tar.gz" \
+          | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['downloadUrl'])")
         echo "Liberica URL: ${LIBERICA_URL}"
         wget --tries=5 --retry-on-http-error=502,503,504 -q -O /tmp/liberica-jre.tar.gz "${LIBERICA_URL}"
         JAVA_DIR="${{ github.workspace }}/repository/src/modules/minecraft/filesystem/root/opt/java"
