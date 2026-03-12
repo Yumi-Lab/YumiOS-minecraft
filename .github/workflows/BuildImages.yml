@@ -115,3 +115,16 @@ jobs:
         with:
           name: ${{ steps.move-image.outputs.image }}.img.sha256
           path: ${{ steps.move-image.outputs.image }}.img.sha256
+
+      - name: Deploy to download.yumi-lab.com
+        if: github.event_name != 'pull_request'
+        env:
+          DE_SSH_KEY: ${{ secrets.DE_SSH_KEY }}
+        shell: bash
+        run: |
+          echo "$DE_SSH_KEY" > /tmp/de_key && chmod 600 /tmp/de_key
+          ssh-keyscan 212.227.202.68 >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -i /tmp/de_key root@212.227.202.68 "rm -f /var/www/download.yumi-lab.com/YumiOS-minecraft/*.img.xz"
+          scp -i /tmp/de_key ${{ steps.move-image.outputs.image }}.img.xz root@212.227.202.68:/var/www/download.yumi-lab.com/YumiOS-minecraft/
+          rm /tmp/de_key
+          echo "✅ https://download.yumi-lab.com/YumiOS-minecraft/${{ steps.move-image.outputs.image }}.img.xz"
